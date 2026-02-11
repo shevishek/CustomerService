@@ -1,83 +1,55 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Repository.Entities;
+using Repository.Interfaces;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CustomerService.webApi.Controllers
 {
-    public class CallController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CallController : ControllerBase
     {
-        // GET: CallController
-        public ActionResult Index()
+        private readonly IRepository<Call> repository;
+
+        public CallController(IRepository<Call> repository)
         {
-            return View();
+            this.repository = repository;
         }
 
-        // GET: CallController/Details/5
-        public ActionResult Details(int id)
+        // GET: api/<CallController>
+        [HttpGet]
+        public async Task<IEnumerable<Call>> Get()
         {
-            return View();
+            return await repository.GetAllAsync();
         }
 
-        // GET: CallController/Create
-        public ActionResult Create()
+        // GET api/<CallController>/5
+        [HttpGet("{id}")]
+        public async Task<Call> Get(int id)
         {
-            return View();
+            return await repository.GetByIdAsync(id);
         }
 
-        // POST: CallController/Create
+        // POST api/<CallController>
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async void Post([FromBody] Call call)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            await repository.AddAsync(call);
         }
 
-        // GET: CallController/Edit/5
-        public ActionResult Edit(int id)
+        // PUT api/<CallController>/5
+        [HttpPut("{id}")]
+        public async Task Put(int id, [FromBody] Call call)
         {
-            return View();
+            await repository.UpdateAsync(id,call);
         }
 
-        // POST: CallController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        // DELETE api/<CallController>/5
+        [HttpDelete("{id}")]
+        public async Task Delete(int id)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: CallController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: CallController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            await repository.DeleteAsync(id);
         }
     }
 }

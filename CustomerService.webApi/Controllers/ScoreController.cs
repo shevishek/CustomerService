@@ -1,83 +1,54 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Repository.Entities;
+using Repository.Interfaces;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CustomerService.webApi.Controllers
 {
-    public class ScoreController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ScoreController : ControllerBase
     {
-        // GET: ScoreController
-        public ActionResult Index()
+        private readonly IRepository<Score> repository;
+
+        public ScoreController(IRepository<Score> repository)
         {
-            return View();
+            this.repository = repository;
+        }
+        // GET: api/<ScoreController>
+        [HttpGet]
+        public async Task<IEnumerable<Score>> Get()
+        {
+            return await repository.GetAllAsync();
         }
 
-        // GET: ScoreController/Details/5
-        public ActionResult Details(int id)
+        // GET api/<ScoreController>/5
+        [HttpGet("{id}")]
+        public async Task<Score> Get(int id)
         {
-            return View();
+            return await repository.GetByIdAsync(id);
         }
 
-        // GET: ScoreController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: ScoreController/Create
+        // POST api/<ScoreController>
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task Post([FromBody] Score score)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            await repository.AddAsync(score);
         }
 
-        // GET: ScoreController/Edit/5
-        public ActionResult Edit(int id)
+        // PUT api/<ScoreController>/5
+        [HttpPut("{id}")]
+        public async Task Put(int id, [FromBody] Score score)
         {
-            return View();
+            await repository.UpdateAsync(id,score);
         }
 
-        // POST: ScoreController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        // DELETE api/<ScoreController>/5
+        [HttpDelete("{id}")]
+        public async Task Delete(int id)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: ScoreController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: ScoreController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            await repository.DeleteAsync(id);
         }
     }
 }

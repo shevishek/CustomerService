@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Service.Interfaces
 {
-    internal class Iservice
+    public interface Iservice<T>
     {
+        Task<List<T>> GetAllAsync();
+        Task<T> GetByIdAsync(int id);
+        Task<T> AddAsync(T item);
+        Task<T> UpdateAsync(int id, T item);
+        Task DeleteAsync(int id);
     }
 }

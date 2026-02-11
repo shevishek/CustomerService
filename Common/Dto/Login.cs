@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Common.Dto
 {
-    internal class Login
+    public class Login
     {
         [Required(ErrorMessage = "שם פרטי הוא שדה חובה")]
         public string FirstName { get; set; }

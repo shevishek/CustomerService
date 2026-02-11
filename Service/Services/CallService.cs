@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Service.Services
 {
-    internal class CallService
+    public class CallService
     {
     }
 }

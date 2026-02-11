@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Repository.Entities;
 using Repository.Interfaces;
-
+using Common.Dto;
+using Service.Interfaces;
+using Service.Services;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CustomerService.webApi.Controllers
@@ -10,12 +12,16 @@ namespace CustomerService.webApi.Controllers
     [ApiController]
     public class OperatorController : ControllerBase
     {
-
         private readonly IRepository<Operator> repository;
+        private readonly IsExist<OperatorDto> _isExist; 
+        //private readonly IAuthService _authService;
 
-        public OperatorController(IRepository<Operator> repository)
+        // כאן אנחנו מקבלים את הכל מהמערכת
+        public OperatorController(IRepository<Operator> repository, IsExist<OperatorDto> isExist)//, IAuthService authService
         {
             this.repository = repository;
+            this._isExist = isExist;
+            //this._authService = authService;
         }
         // GET: api/<OperatorController>
         [HttpGet]
@@ -50,6 +56,16 @@ namespace CustomerService.webApi.Controllers
         public async Task Delete(int id)
         {
             await repository.DeleteAsync(id);
+        }
+
+        [HttpPost("/login")]
+        public IActionResult Login([FromBody] Login loginData)
+        {
+            // 1. בדיקה מול ה-Repository שהמשתמש קיים (דילגתי על זה לצורך הדוגמה)
+            var o= _isExist.Exist(loginData);
+            // 2. אם המשתמש תקין - קוראים לסרביס לייצר טוקן
+            var token = GenerateToken(loginData);//, "User"
+            return Ok(new { token = token });
         }
     }
 }

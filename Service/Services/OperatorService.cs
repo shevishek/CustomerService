@@ -46,7 +46,7 @@ namespace Service.Services
         }
 
         //יצירת טוקן
-        private string GenerateToken(OperatorDto op)
+        public string GenerateToken(OperatorDto op)
         {
             //המפתח להצפנה
             var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

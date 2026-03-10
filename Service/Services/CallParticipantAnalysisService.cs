@@ -28,8 +28,20 @@ namespace Service.Services
             _configuration = configuration;
         }
 
-       
 
-        
+        //קבלת פרטי שיחה ווליום אורך צפיפות
+        //public async Task<List<CompanyDto>> setDetails(Call call)
+        //{
+        //    Console.WriteLine("נתוני שיחה טלפנית");
+        //    var (avgVolume, peakVolume) = VolumeAnalyzer.Analyze("agent.wav");
+        //    Console.WriteLine($"ווליום ממוצע (RMS): {avgVolume:0.000}");
+        //    Console.WriteLine($"ווליום מקסימלי (Peak): {peakVolume:0.000}");
+        //    var duration = VolumeAnalyzer.GetDuration("agent.wav");
+        //    Console.WriteLine($"אורך השיחה: {duration}");
+        //    int wordCount = speakerTexts["Guest-1"].Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+        //    double wordsPerSecond = wordCount / duration.TotalSeconds;
+        //    Console.WriteLine($"צפיפות שיחה: {wordsPerSecond}");
+        //}
+
     }
 }

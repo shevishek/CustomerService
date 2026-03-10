@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Common.Dto;
+using Microsoft.AspNetCore.Mvc;
 using Repository.Entities;
 using Repository.Interfaces;
+using Service.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,45 +12,48 @@ namespace CustomerService.webApi.Controllers
     [ApiController]
     public class CompanyController : ControllerBase
     {
-        private readonly IRepository<Company> repository;
+        //private readonly IRepository<Company> repository;
 
-        public CompanyController(IRepository<Company> repository)
+        private readonly Iservice<CompanyDto> service;
+        public CompanyController(Iservice<CompanyDto>service)//IRepository<Company> repository,
         {
-            this.repository = repository;
+            //this.repository = repository;
+            this.service = service;
         }
         // GET: api/<CompanyController>
         [HttpGet]
-        public async Task<IEnumerable<Company>> Get()
+        public async Task<ActionResult<IEnumerable<CompanyDto>>> Get()
         {
-            return await repository.GetAllAsync() ;
+            var companies= await service.GetAllAsync() ;
+            return Ok(companies);
         }
 
         // GET api/<CompanyController>/5
         [HttpGet("{id}")]
-        public async Task<Company> Get(int id)
+        public async Task<CompanyDto> Get(int id)
         {
-            return await repository.GetByIdAsync(id);
+            return await service.GetByIdAsync(id);
         }
 
         // POST api/<CompanyController>
         [HttpPost]
-        public async Task Post([FromBody] Company company)
+        public async Task Post([FromBody] CompanyDto company)
         {
-            await repository.AddAsync(company);
+            await service.AddAsync(company);
         }
 
         // PUT api/<CompanyController>/5
         [HttpPut("{id}")]
-        public async Task Put(int id, [FromBody] Company company)
+        public async Task Put(int id, [FromBody] CompanyDto company)
         {
-            await repository.UpdateAsync(id, company);
+            await service.UpdateAsync(id, company);
         }
 
         // DELETE api/<CompanyController>/5
         [HttpDelete("{id}")]
         public async Task Delete(int id)
         {
-            await repository.DeleteAsync(id);
+            await service.DeleteAsync(id);
         }
     }
 }

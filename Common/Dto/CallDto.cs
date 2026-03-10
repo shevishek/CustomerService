@@ -9,7 +9,6 @@ namespace Common.Dto
 {
     public class CallDto
     {
-        public int Id { get; set; }
 
         [Required(ErrorMessage = "חובה להזין תאריך שיחה")]
         public DateTime CallDate { get; set; }

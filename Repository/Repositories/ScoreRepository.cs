@@ -20,7 +20,7 @@ namespace Repository.Repositories
         public async Task<Score> AddAsync(Score item)
         {
             ctx.Scores.Add(item);
-            ctx.SaveChangesAsync();
+            await ctx.SaveChangesAsync();
             return item;
         }
 

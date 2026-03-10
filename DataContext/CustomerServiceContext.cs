@@ -11,12 +11,15 @@ namespace DataContext
 {
     public class CustomerServiceContext:DbContext,IContext
     {
-        private readonly string _connection;
+        //private readonly string _connection;
 
-        public CustomerServiceContext(string options)
-        {
-            _connection = options;
-        }
+        //public CustomerServiceContext(string options)
+        //{
+        //    _connection = options;
+        //}
+        public CustomerServiceContext(DbContextOptions<CustomerServiceContext> options)
+       : base(options) { }
+
 
         // מימוש ה-DbSets מהממשק
         public DbSet<Company> Companies { get; set; }
@@ -26,9 +29,29 @@ namespace DataContext
         public DbSet<Score> Scores { get; set; }
 
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer(_connection);
+        //}
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            optionsBuilder.UseSqlServer(_connection);
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Operator>()
+                .Property(o => o.Role)
+                .HasConversion<string>();
+
+            // נבטל את המחיקה האוטומטית בין ציון לשיחה כדי למנוע כפילות
+            modelBuilder.Entity<Score>()
+                .HasOne(s => s.Call)
+                .WithMany(c => c.Scores)
+                .HasForeignKey(s => s.CallId)
+                .OnDelete(DeleteBehavior.NoAction); // כאן הפתרון
+
+            // אם יש לך קשרים נוספים שגורמים לבעיה, אפשר להוסיף אותם כאן
+
+            base.OnModelCreating(modelBuilder);
         }
 
     }

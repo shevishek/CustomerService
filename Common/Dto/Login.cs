@@ -9,11 +9,8 @@ namespace Common.Dto
 {
     public class Login
     {
-        [Required(ErrorMessage = "שם פרטי הוא שדה חובה")]
-        public string FirstName { get; set; }
-
-        [Required(ErrorMessage = "שם משפחה הוא שדה חובה")]
-        public string LastName { get; set; }
+        [Required(ErrorMessage = "סיסמא הינה שדה חובה")]
+        public string PasswordHash { get; set; }
 
         [EmailAddress(ErrorMessage = "כתובת האימייל אינה תקינה")]
         public string Email { get; set; } // הוספתי אימייל כדוגמה לוולידציה חשובה

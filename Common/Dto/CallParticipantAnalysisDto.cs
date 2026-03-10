@@ -9,7 +9,7 @@ namespace Common.Dto
 {
     public class CallParticipantAnalysisDto
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         [Required]
         public int CallId { get; set; }

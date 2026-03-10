@@ -9,44 +9,54 @@ using Repository.Repositories;
 using Service.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using DataContext;
 
 namespace Service.Services
 {
-    public class OperatorService : IsExist<OperatorDto>,Iservice<OperatorDto>
+    public class OperatorService : Iservice<OperatorDto>,IsExist<Operator>
     {
         private readonly IRepository<Operator> repository;
         private readonly IMapper mapper;
         private readonly IConfiguration _configuration;
-        public readonly IsExist<OperatorDto> isExist;
+        //public readonly IsExist<OperatorDto> isExist;
+        private readonly CustomerServiceContext _context;
 
-        public OperatorService(IRepository<Operator> repository, IMapper map, IConfiguration configuration, IsExist<OperatorDto> isExist)
+
+        public OperatorService(IRepository<Operator> repository, IMapper map, IConfiguration configuration, CustomerServiceContext context)// IsExist<OperatorDto> isExist,
         {
             this.repository = repository;
             this.mapper = map;
             this._configuration = configuration;
-            this.isExist = isExist;
+            //this.isExist = isExist;
+            this._context = context;
         }
 
         public async Task<List<OperatorDto>> GetAllAsync()
         {
             var rep = await repository.GetAllAsync();
-            return await mapper.Map<Task<List<OperatorDto>>>(rep);
+            return  mapper.Map<List<OperatorDto>>(rep);
         }
-        public OperatorDto Exist(Login l)
+        public Operator Exist(Login l)
         {
-            var op = GetAllAsync().Result.FirstOrDefault(x => x.FirstName == l.FirstName);
-            if (op != null)
-                return op;
-            return null;
+            var op = _context.Operators.FirstOrDefault(x => x.Mail == l.Email);
+            if (op == null)               
+                return null;
+            bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(l.PasswordHash, op.PasswordHash);
+
+            if (!isPasswordCorrect)
+            {
+                return null;            }
+            return op;
         }
 
         //יצירת טוקן
-        public string GenerateToken(OperatorDto op)
+        public string GenerateToken(Operator op)
         {
             //המפתח להצפנה
             var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -55,10 +65,10 @@ namespace Service.Services
             var credentials = new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
             //אובייקט שמכיל את נתוני המשתמש לפי מפתחות
             var claims = new[] {
-            new Claim(ClaimTypes.Email,op.Email),
+            new Claim(ClaimTypes.Email,op.Mail),
             new Claim(ClaimTypes.Name,op.FirstName),
-            new Claim(ClaimTypes.Email,op.LastName),            
-            new Claim(ClaimTypes.Role,"user"),
+            new Claim(ClaimTypes.Email,op.LastName),
+            new Claim(ClaimTypes.Role, op.Role.ToString())
             //new Claim(ClaimTypes.GivenName,user.GivenName)
             };
             var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"],
@@ -73,29 +83,42 @@ namespace Service.Services
 
         public async Task<OperatorDto> GetByIdAsync(int id) 
         {
-            // 1. מחכים לקבל את הישות (Entity) מה-Repository
             var operatorEntity = await repository.GetByIdAsync(id);
 
-            // 2. ממפים את הישות שחזרה ל-DTO (או למה שאת צריכה להחזיר)
             return mapper.Map<OperatorDto>(operatorEntity);
         }
         public async Task<OperatorDto> AddAsync(OperatorDto item) 
         {
+            string passwordFromUser = item.PasswordHash;
+
+            // יצירת ה-Hash (ההצפנה)
+            string hashedPath = BCrypt.Net.BCrypt.HashPassword(passwordFromUser);
+
+            // עכשיו שומרים את hashedPath בבסיס הנתונים
+
+            item.PasswordHash = hashedPath;
+           
             var operatorEntity = await repository.AddAsync(mapper.Map<Operator>(item));
 
-            // 2. ממפים את הישות שחזרה ל-DTO (או למה שאת צריכה להחזיר)
             return mapper.Map<OperatorDto>(operatorEntity);
         }
        public async Task<OperatorDto> UpdateAsync(int id, OperatorDto item) 
         {
-            var operatorEntity = await repository.UpdateAsync(id, mapper.Map<Operator>(item));
-
-            // 2. ממפים את הישות שחזרה ל-DTO (או למה שאת צריכה להחזיר)
-            return mapper.Map<OperatorDto>(operatorEntity);
+            var op = _context.Operators.FirstOrDefault(x => x.OperatorId == id);
+            if (op!=null)
+            {
+                string passwordFromUser = item.PasswordHash;
+                string hashedPath = BCrypt.Net.BCrypt.HashPassword(passwordFromUser);
+                item.PasswordHash = hashedPath;
+                mapper.Map(item, op);
+                var operatorEntity = await repository.UpdateAsync(id, op);
+                return mapper.Map<OperatorDto>(operatorEntity);
+            }
+            return null;
         }
        public async Task DeleteAsync(int id) 
-        {  
-            await DeleteAsync(id);
+        {
+            await repository.DeleteAsync(id);
         }
     }
 }

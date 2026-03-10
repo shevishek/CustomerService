@@ -4,6 +4,7 @@ using Repository.Interfaces;
 using Common.Dto;
 using Service.Interfaces;
 using Service.Services;
+using Microsoft.AspNetCore.Authorization;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CustomerService.webApi.Controllers
@@ -12,59 +13,69 @@ namespace CustomerService.webApi.Controllers
     [ApiController]
     public class OperatorController : ControllerBase
     {
-        private readonly IRepository<Operator> repository;
-        private readonly IsExist<OperatorDto> _isExist; 
+        private readonly Iservice<OperatorDto> service;
+        //private readonly IRepository<Operator> repository;
+        //private readonly IsExist<Operator> _isExist;
+        private readonly OperatorService _operatorService;
+
         //private readonly IAuthService _authService;
 
         // כאן אנחנו מקבלים את הכל מהמערכת
-        public OperatorController(IRepository<Operator> repository, IsExist<OperatorDto> isExist)//, IAuthService authService
+        public OperatorController(Iservice<OperatorDto> service, OperatorService operatorService)//, IAuthService authService, IsExist<Operator> isExist
         {
-            this.repository = repository;
-            this._isExist = isExist;
+            this.service = service;
+            //this._isExist = isExist;
+            _operatorService = operatorService;
             //this._authService = authService;
         }
         // GET: api/<OperatorController>
         [HttpGet]
-        public async  Task<IEnumerable<Operator>> Get()
+       // [Authorize(Roles = "Admin")]
+        public async  Task<IEnumerable<OperatorDto>> Get()
         {
-            return await repository.GetAllAsync();
+            return await service.GetAllAsync();
         }
 
         // GET api/<OperatorController>/5
         [HttpGet("{id}")]
-        public async Task<Operator> Get(int id)
+        public async Task<OperatorDto> Get(int id)
         {
-            return await repository.GetByIdAsync(id);
+            return await service.GetByIdAsync(id);
         }
 
         // POST api/<OperatorController>
         [HttpPost]
-        public async Task Post([FromBody] Operator op)
+        public async Task<IActionResult> Post([FromBody] OperatorDto op)
         {
-            await repository.AddAsync(op);
+             await service.AddAsync(op);
+             return Ok(op);
         }
 
         // PUT api/<OperatorController>/5
         [HttpPut("{id}")]
-        public async Task Put(int id, [FromBody] Operator op)
+        public async Task<IActionResult> Put(int id, [FromBody] OperatorDto op)
         {
-            await repository.UpdateAsync(id, op);
+            await service.UpdateAsync(id, op);
+            return Ok(op);
         }
 
         // DELETE api/<OperatorController>/5
         [HttpDelete("{id}")]
-        public async Task Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            await repository.DeleteAsync(id);
+            await service.DeleteAsync(id);
+            return NoContent();
         }
 
         [HttpPost("/login")]
         public IActionResult Login([FromBody] Login loginData)
         {
+
             // 1. בדיקה מול ה-Repository שהמשתמש קיים (דילגתי על זה לצורך הדוגמה)
-            var o= _isExist.Exist(loginData);
+            //האם המשתמש קיים וכן אימות הסיסמא
+            var o= _operatorService.Exist(loginData);
             // 2. אם המשתמש תקין - קוראים לסרביס לייצר טוקן
-            var token = GenerateToken(loginData);//, "User"
+            var token = _operatorService.GenerateToken(o);//, "User"
             return Ok(new { token = token });
         }
     }

@@ -20,7 +20,7 @@ namespace Repository.Repositories
         public async Task<Call> AddAsync(Call item)
         {
             ctx.Calls.Add(item);
-            ctx.SaveChangesAsync();
+            await ctx.SaveChangesAsync();
             return item;
         }
 

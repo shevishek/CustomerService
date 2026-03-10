@@ -9,13 +9,13 @@ namespace Common.Dto
 {
     public class CompanyDto
     {
-        public int Id { get; set; }
+        public int CompanyId { get; set; }
 
         [Required(ErrorMessage = "שם חברה הוא שדה חובה")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "שם חברה חייב להיות בין 2 ל-100 תווים")]
-        public string Name { get; set; }
+        public string CompanyName { get; set; }
 
-        [Required(ErrorMessage = "כתובת היא שדה חובה")]
-        public string Address { get; set; }
+        [MaxLength(200)]
+        public string? IntroPhrase { get; set; }
     }
 }

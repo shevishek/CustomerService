@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Repository.Repositories
 {
     public class OperatorRepository : IRepository<Operator>
@@ -20,7 +21,7 @@ namespace Repository.Repositories
         public async Task<Operator> AddAsync(Operator item)
         {
             ctx.Operators.Add(item);
-            ctx.SaveChangesAsync();
+            await  ctx.SaveChangesAsync();
             return item;
         }
 
@@ -42,7 +43,6 @@ namespace Repository.Repositories
 
         public async Task<Operator> UpdateAsync(int id, Operator item)
         {
-            ctx.Operators.Update(item);
             await ctx.SaveChangesAsync();
             return item;
         }

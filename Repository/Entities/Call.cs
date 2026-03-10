@@ -25,7 +25,7 @@ namespace Repository.Entities
         public string? Notes { get; set; }
 
         // קשרי גומלין
-        [ForeignKey("OfficeId")]
+        [ForeignKey("CompanyId")]
         public virtual Company Company { get; set; }
 
         public virtual ICollection<CallParticipantAnalysis> CallParticipants { get; set; }

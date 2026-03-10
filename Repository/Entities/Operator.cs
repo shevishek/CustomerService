@@ -22,6 +22,8 @@ namespace Repository.Entities
         [MaxLength(50)]
         public string LastName { get; set; }
 
+        public string PasswordHash { get; set; }
+
         public DateTime? HireDate { get; set; }
 
         public string? Mail { get; set; }
@@ -31,9 +33,11 @@ namespace Repository.Entities
         public double? MonthlyScore { get; set; }
 
         public double? DailyScore { get; set; }
+        public UserRoleEntity Role { get; set; } = UserRoleEntity.Operator;
+
 
         // קשרי גומלין
-        [ForeignKey("OfficeId")]
+        [ForeignKey("CompanyId")]
         public virtual Company Company { get; set; }
 
         public virtual ICollection<CallParticipantAnalysis> ParticipantAnalyses { get; set; }

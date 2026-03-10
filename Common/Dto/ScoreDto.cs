@@ -9,7 +9,7 @@ namespace Common.Dto
 {
     public class ScoreDto
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         [Required(ErrorMessage = "חובה להזין ציון")]
         [Range(0, 100, ErrorMessage = "הציון חייב להיות בין 0 ל-100")]

@@ -20,7 +20,7 @@ namespace Repository.Repositories
         public async Task<CallParticipantAnalysis> AddAsync(CallParticipantAnalysis item)
         {
             ctx.CallParticipantAnalyses.Add(item);
-            ctx.SaveChangesAsync();
+            await ctx.SaveChangesAsync();
             return item;
         }
 

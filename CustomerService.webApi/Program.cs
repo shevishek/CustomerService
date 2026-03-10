@@ -1,10 +1,12 @@
 using DataContext;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Repository.Interfaces;
 using System.Text;
+using Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,10 +59,32 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
              });
 
+//var connection = builder.Configuration.GetConnectionString("database");
+//builder.Services.AddSingleton<IContext>(new CustomerServiceContext(connection));
+
 var connection = builder.Configuration.GetConnectionString("database");
-builder.Services.AddSingleton<IContext>(new CustomerServiceContext(connection));
+builder.Services.AddDbContext<CustomerServiceContext>(options =>
+    options.UseSqlServer(connection));
+builder.Services.AddScoped<IContext>(provider =>
+    provider.GetRequiredService<CustomerServiceContext>());
+
+builder.Services.AddAutoMapper(typeof(MapperProfile));
+builder.Services.AddServices(builder.Configuration);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173") // הכתובת של הריאקט שלך
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
+
+app.UseCors("AllowReactApp");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
